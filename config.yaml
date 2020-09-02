@@ -2,20 +2,37 @@ fast5_dir:    "fast5/"
 model_config: "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
 decontam_db:  "/hps/nobackup/research/zi/projects/tech_wars/data/QC/decontam_db/"
 containers:
-  guppy:  "library://mbhall88/default/guppy-gpu:3.4.5"
-  conda:  "docker://continuumio/miniconda3:4.7.12"
-  pycoqc: "docker://quay.io/biocontainers/pycoqc:2.5.0.23--py_0"
-  krona:                "docker://quay.io/biocontainers/krona:2.7--pl526_2"
+  guppy:   "library://mbhall88/default/guppy-gpu:3.4.5"
+  conda:   "docker://continuumio/miniconda3:4.7.12"
+  pycoqc:  "docker://quay.io/biocontainers/pycoqc:2.5.0.23--py_0"
+  krona:   "docker://quay.io/biocontainers/krona:2.7--pl526_2"
   mykrobe: "docker://quay.io/biocontainers/mykrobe:0.8.2--py36h1c69254_1"
 envs:
   aln_tools:            "envs/aln_tools.yaml"
   filter_reads:         "envs/filter_reads.yaml"
   rg:                   "envs/rg.yaml"
   generate_krona_input: "envs/generate_krona_input.yaml"
+  filter_snps:          "envs/filter_snps.yaml"
 scripts:
   filter_reads:         "scripts/filter_reads.py"
   generate_krona_input: "scripts/generate_krona_input.py"
+  filter_snps:          "scripts/apply_filters.py"
 captions:
   pycoqc:  "report/pycoqc.rst"
   krona:   "report/krona.rst"
   mykrobe: "report/mykrobe.rst"
+genome_size:  4411532
+h37rv:
+  genome: "resources/h37rv.fa"
+  mask:   "resources/compass-mask.bed"
+# filters for nanopore bcftools calls
+filters:
+  min_depth:       0
+  max_depth:       0
+  min_qual:        60
+  min_strand_bias: 0
+  min_bqb:         0
+  min_mqb:         0
+  min_rpb:         0.05
+  max_sgb:         -0.5
+  min_vdb:         0.002

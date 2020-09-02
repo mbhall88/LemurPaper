@@ -26,12 +26,16 @@ report_dir = Path("report").resolve()
 qc_dir = Path("QC").resolve()
 mykrobe_dir = Path("mykrobe").resolve()
 captions = config["captions"]
+reference = config["h37rv"]
+pileup_dir = Path("pileup").resolve()
+calls_dir = Path("calls").resolve()
+filters = config["filters"]
 
 # ======================================================
 # Global functions and variables
 # ======================================================
 output_files = set()
-output_files.add(filtered_dir / "lemur.filtered.fq")
+output_files.add(calls_dir / "lemur.snps.filtered.bcf")
 output_files.add(qc_dir / "qc.html")
 output_files.add(qc_dir / "lemur.krona.html")
 output_files.add(mykrobe_dir / "lemur.dst.json")
@@ -288,4 +292,127 @@ rule predict_resistance:
         """
         mykrobe predict {params.options}  -t {threads} --seq {input.reads} \
             --output {output.json} {params.sample} {params.species} 2> {log}
+        """
+
+
+rule index_reference:
+    input:
+        reference["genome"],
+    output:
+        reference["genome"] + ".fai",
+    log:
+        rule_log_dir / "index_reference.log",
+    container:
+        containers["conda"]
+    wrapper:
+        "0.63.0/bio/samtools/faidx"
+
+
+rule map_reads_to_h37rv:
+    input:
+        target=rules.index_reference.input[0],
+        query=rules.extract_decontaminated_reads.output.reads,
+    output:
+        bam=mapped_dir / "lemur.filtered.h37rv.sorted.bam",
+    threads: 8
+    resources:
+        mem_mb=lambda wildcards, attempt: int(8 * GB) * attempt,
+    container:
+        containers["conda"]
+    conda:
+        envs["aln_tools"]
+    params:
+        minimap_options=" ".join(
+            ["-a", "-L", "--sam-hit-only", "--secondary=no", "-2"]
+        ),
+        minimap_preset="map-ont",
+        sort_options="-O bam",
+    log:
+        rule_log_dir / "map_reads_to_h37rv.log",
+    shell:
+        """
+        (minimap2 {params.minimap_options} \
+            -x {params.minimap_preset} \
+            -t {threads} \
+            {input.target} {input.query} | \
+        samtools sort -@ {threads} -o {output.bam}) 2> {log}
+        """
+
+
+rule pileup:
+    input:
+        index=rules.index_reference.output[0],
+        ref=rules.index_reference.input[0],
+        alignments=rules.map_reads_to_h37rv.output.bam,
+    output:
+        pileup=pileup_dir / "lemur.pileup.bcf",
+    threads: 2
+    resources:
+        mem_mb=lambda wildcards, attempt: int(32 * GB) * attempt,
+    params:
+        options="--ignore-overlaps -O b",
+    log:
+        rule_log_dir / "pileup.log",
+    container:
+        containers["conda"]
+    wrapper:
+        "0.64.0/bio/bcftools/mpileup"
+
+
+rule call_snps:
+    input:
+        pileup=rules.pileup.output.pileup,
+    output:
+        calls=calls_dir / "lemur.snps.bcf",
+    threads: 2
+    resources:
+        mem_mb=lambda wildcards, attempt: int(GB) * attempt,
+    params:
+        caller="-m",
+        options=" ".join(["--ploidy 1", "-O b", "--skip-variants indels"]),
+    log:
+        rule_log_dir / "call_snps.log",
+    container:
+        containers["conda"]
+    wrapper:
+        "0.64.0/bio/bcftools/call"
+
+
+rule filter_snps:
+    input:
+        vcf=rules.call_snps.output.calls,
+    output:
+        vcf=calls_dir / "lemur.snps.filtered.bcf",
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    params:
+        options=" ".join(
+            [
+                "--hist",
+                "--verbose",
+                "--overwrite",
+                f"-d {filters['min_depth']}",
+                f"-D {filters['max_depth']}",
+                f"-q {filters['min_qual']}",
+                f"-s {filters['min_strand_bias']}",
+                f"-b {filters['min_bqb']}",
+                f"-m {filters['min_mqb']}",
+                f"-r {filters['min_rpb']}",
+                f"-V {filters['min_vdb']}",
+                f"-G {filters['max_sgb']}",
+            ]
+        ),
+        script=scripts["filter_snps"],
+    log:
+        rule_log_dir / "filter_snps.log",
+    container:
+        containers["conda"]
+    conda:
+        envs["filter_snps"]
+    shell:
+        """
+        python {params.script} {params.options} \
+            -i {input.vcf} \
+            -o {output.vcf} 2> {log}
         """
