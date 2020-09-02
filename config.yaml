@@ -1,0 +1,4 @@
+fast5_dir:    "fast5/"
+model_config: "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
+containers:
+  guppy: "library://mbhall88/default/guppy-gpu:3.4.5"
