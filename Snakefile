@@ -13,8 +13,8 @@ configfile: "config.yaml"
 
 
 containers: Dict[str, PathLike] = config["containers"]
-envs: Dict[str, PathLike] = config["envs"]
-scripts: Dict[str, PathLike] = config["scripts"]
+# envs: Dict[str, PathLike] = config["envs"]
+# scripts: Dict[str, PathLike] = config["scripts"]
 rule_log_dir = Path("logs/stderr").resolve()
 fast5_dir = Path(config["fast5_dir"]).resolve()
 basecall_dir = Path("basecall").resolve()
