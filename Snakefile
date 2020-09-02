@@ -24,6 +24,7 @@ mapped_dir = Path("mapped").resolve()
 filtered_dir = Path("filtered").resolve()
 report_dir = Path("report").resolve()
 qc_dir = Path("QC").resolve()
+mykrobe_dir = Path("mykrobe").resolve()
 captions = config["captions"]
 
 # ======================================================
@@ -33,6 +34,7 @@ output_files = set()
 output_files.add(filtered_dir / "lemur.filtered.fq")
 output_files.add(basecall_dir / "qc.html")
 output_files.add(qc_dir / "lemur.krona.html")
+output_files.add(mykrobe_dir / "lemur.dst.json")
 
 
 # ======================================================
@@ -260,3 +262,30 @@ rule plot_sample_composition:
         rule_log_dir / "plot_sample_composition.log",
     shell:
         "ktImportText {input.tsv} -o {output.chart} &> {log}"
+
+
+rule predict_resistance:
+    input:
+        reads=rules.extract_decontaminated_reads.output.reads,
+    output:
+        json=report(
+            mykrobe_dir / "lemur.dst.json",
+            category="AMR Prediction",
+            caption=captions["mykrobe"],
+        ),
+    threads: 1
+    resources:
+        mem_mb=int(2 * GB),
+    container:
+        containers["mykrobe"]
+    params:
+        sample="lemur",
+        species="tb",
+        options="--force --ont --format json",
+    log:
+        rule_log_dir / "predict_resistance.log",
+    shell:
+        """
+        mykrobe predict {params.options}  -t {threads} --seq {input.reads} \
+            --output {output.json} {params.sample} {params.species} 2> {log}
+        """
