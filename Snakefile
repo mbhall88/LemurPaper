@@ -31,7 +31,7 @@ captions = config["captions"]
 # ======================================================
 output_files = set()
 output_files.add(filtered_dir / "lemur.filtered.fq")
-output_files.add(basecall_dir / "qc.html")
+output_files.add(qc_dir / "qc.html")
 output_files.add(qc_dir / "lemur.krona.html")
 
 

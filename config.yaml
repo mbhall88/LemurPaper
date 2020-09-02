@@ -5,12 +5,12 @@ containers:
   guppy:  "library://mbhall88/default/guppy-gpu:3.4.5"
   conda:  "docker://continuumio/miniconda3:4.7.12"
   pycoqc: "docker://quay.io/biocontainers/pycoqc:2.5.0.23--py_0"
+  krona:                "docker://quay.io/biocontainers/krona:2.7--pl526_2"
 envs:
   aln_tools:            "envs/aln_tools.yaml"
   filter_reads:         "envs/filter_reads.yaml"
   rg:                   "envs/rg.yaml"
   generate_krona_input: "envs/generate_krona_input.yaml"
-  krona:                "docker://quay.io/biocontainers/krona:2.7--pl526_2"
 scripts:
   filter_reads:         "scripts/filter_reads.py"
   generate_krona_input: "scripts/generate_krona_input.py"
