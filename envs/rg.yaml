@@ -1,0 +1,6 @@
+name: ripgrep
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - ripgrep=12.1.1

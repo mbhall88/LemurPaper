@@ -1,4 +1,13 @@
 fast5_dir:    "fast5/"
 model_config: "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
+decontam_db:  "/hps/nobackup/research/zi/projects/tech_wars/data/QC/decontam_db/"
 containers:
   guppy: "library://mbhall88/default/guppy-gpu:3.4.5"
+  conda: "docker://continuumio/miniconda3:4.7.12"
+envs:
+  aln_tools:    "envs/aln_tools.yaml"
+  filter_reads: "envs/filter_reads.yaml"
+  rg:           "envs/rg.yaml"
+scripts:
+  filter_reads: "scripts/filter_reads.py"
+
