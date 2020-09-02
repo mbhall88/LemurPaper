@@ -22,12 +22,17 @@ guppy_outdir = basecall_dir / "guppy"
 decontam_dir = Path(config["decontam_db"]).resolve()
 mapped_dir = Path("mapped").resolve()
 filtered_dir = Path("filtered").resolve()
+report_dir = Path("report").resolve()
+qc_dir = Path("QC").resolve()
+captions = config["pycoqc"]
 
 # ======================================================
 # Global functions and variables
 # ======================================================
 output_files = set()
 output_files.add(filtered_dir / "lemur.filtered.fq")
+output_files.add(basecall_dir / "qc.html")
+output_files.add(qc_dir / "lemur.krona.html")
 
 
 # ======================================================
@@ -36,6 +41,9 @@ output_files.add(filtered_dir / "lemur.filtered.fq")
 localrules:
     all,
     combine_basecall_fastq,
+
+
+report: report_dir / "workflow.rst"
 
 
 rule all:
@@ -90,6 +98,28 @@ rule combine_basecall_fastq:
         """
 
 
+rule qc_plots:
+    input:
+        summary=rules.basecall.output.summary,
+    output:
+        report=report(
+            qc_dir / "qc.html", category="Quality Control", caption=captions["pycoqc"],
+        ),
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    params:
+        options="--report_title 'All basecalled lemur nanopore reads'",
+    container:
+        containers["pycoqc"]
+    log:
+        rule_log_dir / "qc_plots.log",
+    shell:
+        """
+        pycoQC {params.options} -f {input.summary} -o {output.report} 2> {log}
+        """
+
+
 rule map_reads_to_decontam_db:
     input:
         index=decontam_dir / "remove_contam.fa.gz.map-ont.mmi",
@@ -130,7 +160,7 @@ rule index_mapped_reads:
     log:
         rule_log_dir / "index_mapped_reads.log",
     shell:
-        "samtool index -@ {threads} {input.alignment} 2> {log}"
+        "samtools index -@ {threads} {input.alignment} 2> {log}"
 
 
 rule filter_contamination:
@@ -184,3 +214,49 @@ rule extract_decontaminated_reads:
         (paste - - - - < {input.reads} | \
         rg -f {input.read_ids} | tr "\t" "\n") > {output.reads} 2> {log}
         """
+
+
+rule generate_krona_input:
+    input:
+        bam=rules.map_reads_to_decontam_db.output.bam,
+        index=rules.index_mapped_reads.output.index,
+        metadata=rules.filter_contamination.input.metadata,
+    output:
+        krona_input=qc_dir / "lemur.krona.tsv",
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: int(0.5 * GB) * attempt,
+    container:
+        containers["conda"]
+    conda:
+        envs["generate_krona_input"]
+    params:
+        script=scripts["generate_krona_input"],
+        extras="--ignore-secondary",
+    log:
+        rule_log_dir / "generate_krona_input.log",
+    shell:
+        """
+        python {params.script} {params.extras} \
+            -i {input.bam} -m {input.metadata} -o {output.krona_input} 2> {log}
+        """
+
+
+rule plot_sample_composition:
+    input:
+        tsv=rules.generate_krona_input.output.krona_input,
+    output:
+        chart=report(
+            qc_dir / "lemur.krona.html",
+            category="Quality Control",
+            caption=report_dir / "krona.rst",
+        ),
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * GB,
+    container:
+        containers["krona"]
+    log:
+        rule_log_dir / "plot_sample_composition.log",
+    shell:
+        "ktImportText {input.tsv} -o {output.chart} &> {log}"
