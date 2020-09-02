@@ -35,7 +35,6 @@ class Filter(Enum):
 class Genotype(NamedTuple):
     allele1: int
     allele2: int
-    phased: bool
 
     def is_null(self) -> bool:
         """Is the genotype null. i.e. ./."""
@@ -68,6 +67,13 @@ class Genotype(NamedTuple):
         if not self.is_hom_alt():
             return None
         return max(self.allele1, self.allele2) - 1
+
+    @staticmethod
+    def from_arr(arr: List[int]) -> "Genotype":
+        alleles = [a for a in arr if type(a) is int]
+        if len(alleles) < 2:
+            alleles.append(-1)
+        return Genotype(*alleles)
 
 
 class Lineage:
@@ -269,7 +275,7 @@ class Classifier:
         except KeyError:
             filters = repeat(Filter.Pass)
 
-        for sample_idx, gt in enumerate(starmap(Genotype, variant.genotypes)):
+        for sample_idx, gt in enumerate(starmap(Genotype.from_arr, variant.genotypes)):
             failed_filter = next(filters) is Filter.Fail
             if failed_filter:
                 continue
