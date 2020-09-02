@@ -1,6 +1,6 @@
-fast5_dir:    "fast5/"
-model_config: "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
-decontam_db:  "/hps/nobackup/research/zi/projects/tech_wars/data/QC/decontam_db/"
+fast5_dir:     "fast5/"
+model_config:  "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
+decontam_db:   "/hps/nobackup/research/zi/projects/tech_wars/data/QC/decontam_db/"
 containers:
   guppy:   "library://mbhall88/default/guppy-gpu:3.4.5"
   conda:   "docker://continuumio/miniconda3:4.7.12"
@@ -13,15 +13,21 @@ envs:
   rg:                   "envs/rg.yaml"
   generate_krona_input: "envs/generate_krona_input.yaml"
   filter_snps:          "envs/filter_snps.yaml"
+  assign_lineages:      "envs/assign_lineages.yaml"
 scripts:
   filter_reads:         "scripts/filter_reads.py"
   generate_krona_input: "scripts/generate_krona_input.py"
   filter_snps:          "scripts/apply_filters.py"
+  assign_lineages:      "scripts/assign_lineages.py"
 captions:
   pycoqc:  "report/pycoqc.rst"
   krona:   "report/krona.rst"
   mykrobe: "report/mykrobe.rst"
-genome_size:  4411532
+  lineage: "report/lineage.rst"
+genome_size:   4411532
+lineage_panel: "resources/snps_for_typing.csv"
+default_lineage:      "unknown"  # the name given to samples with no variants in the panel of lineage-defining variants
+ref_lineage_position: 1692141  # the position in the lineage panel that defines the lineage of H37Rv
 h37rv:
   genome: "resources/h37rv.fa"
   mask:   "resources/compass-mask.bed"

@@ -30,12 +30,13 @@ reference = config["h37rv"]
 pileup_dir = Path("pileup").resolve()
 calls_dir = Path("calls").resolve()
 filters = config["filters"]
+lineage_dir = Path("lineage").resolve()
 
 # ======================================================
 # Global functions and variables
 # ======================================================
 output_files = set()
-output_files.add(calls_dir / "lemur.snps.filtered.bcf")
+output_files.add(lineage_dir / "lemur.lineage.csv")
 output_files.add(qc_dir / "qc.html")
 output_files.add(qc_dir / "lemur.krona.html")
 output_files.add(mykrobe_dir / "lemur.dst.json")
@@ -415,4 +416,42 @@ rule filter_snps:
         python {params.script} {params.options} \
             -i {input.vcf} \
             -o {output.vcf} 2> {log}
+        """
+
+
+rule assign_lineage:
+    input:
+        vcf=rules.filter_snps.output.vcf,
+        panel=config["lineage_panel"],
+    output:
+        assignments=report(
+            lineage_dir / "lemur.lineage.csv",
+            category="Lineage",
+            caption=captions["lineage"],
+        ),
+    threads: 1
+    resources:
+        mem_mb=GB,
+    container:
+        containers["conda"]
+    conda:
+        envs["assign_lineages"]
+    params:
+        script=scripts["assign_lineages"],
+        default_lineage=config["default_lineage"], # the name given to samples with no hits in the panel
+        max_het=1,
+        max_alt_lineages=1,
+        ref_lineage_position=config["ref_lineage_position"],
+        extras="--verbose",
+    log:
+        rule_log_dir / "assign_lineage.log",
+    shell:
+        """
+        python {params.script} --input {input.vcf} \
+            --panel {input.panel} \
+            --output {output.assignments} \
+            --default-lineage {params.default_lineage} \
+            --max-het {params.max_het} \
+            --ref-lineage-position {params.ref_lineage_position} \
+            --max-alt-lineages {params.max_alt_lineages} {params.extras} 2> {log}
         """
