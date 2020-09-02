@@ -117,22 +117,26 @@ rule map_reads_to_decontam_db:
 
 rule index_mapped_reads:
     input:
-        rules.map_reads_to_decontam_db.output.bam,
+        alignment=rules.map_reads_to_decontam_db.output.bam,
     output:
-        mapped_dir / "lemur.all.sorted.bam.bai",
+        index=mapped_dir / "lemur.all.sorted.bam.bai",
     threads: 4
-    params:
-        lambda wildcards, threads: f"-@ {threads}",
+    resources:
+        mem_mb=int(2 * GB),
     container:
         containers["conda"]
-    wrapper:
-        "0.65.0/bio/samtools/index"
+    conda:
+        envs["aln_tools"]
+    log:
+        rule_log_dir / "index_mapped_reads.log",
+    shell:
+        "samtool index -@ {threads} {input.alignment} 2> {log}"
 
 
 rule filter_contamination:
     input:
         bam=rules.map_reads_to_decontam_db.output.bam,
-        index=rules.index_mapped_reads.output[0],
+        index=rules.index_mapped_reads.output.index,
         metadata=decontam_dir / "remove_contam.tsv",
     output:
         keep_ids=filtered_dir / "keep.reads",
