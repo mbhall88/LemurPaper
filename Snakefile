@@ -24,7 +24,7 @@ mapped_dir = Path("mapped").resolve()
 filtered_dir = Path("filtered").resolve()
 report_dir = Path("report").resolve()
 qc_dir = Path("QC").resolve()
-captions = config["pycoqc"]
+captions = config["captions"]
 
 # ======================================================
 # Global functions and variables
@@ -249,7 +249,7 @@ rule plot_sample_composition:
         chart=report(
             qc_dir / "lemur.krona.html",
             category="Quality Control",
-            caption=report_dir / "krona.rst",
+            caption=captions["krona"],
         ),
     threads: 1
     resources:
