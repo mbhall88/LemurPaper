@@ -24,7 +24,7 @@ guppy_outdir = basecall_dir / "guppy"
 # Global functions and variables
 # ======================================================
 output_files = set()
-output_files.add(guppy_outdir / "sequencing_summary.txt")
+output_files.add(basecall_dir / "lemur.all.fq")
 
 
 # ======================================================
@@ -32,6 +32,7 @@ output_files.add(guppy_outdir / "sequencing_summary.txt")
 # ======================================================
 localrules:
     all,
+    combine_basecall_fastq,
 
 
 rule all:
@@ -65,4 +66,22 @@ rule basecall:
             --config {params.config} \
             --device {params.device} \
             --num_callers {params.num_callers}  &> {log}
+        """
+
+
+rule combine_basecall_fastq:
+    input:
+        summary=rules.basecall.output.summary,
+    output:
+        reads=basecall_dir / "lemur.all.fq",
+    threads: 1
+    resources:
+        mem_mb=int(0.5 * GB),
+    params:
+        indir=lambda wildcards, input: Path(input.summary).parent,
+    log:
+        rule_log_dir / "combine_basecall_fastq.log",
+    shell:
+        """
+        awk 1 {params.indir}/*.fastq > {output.reads} 2> {log}
         """
