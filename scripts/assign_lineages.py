@@ -275,7 +275,7 @@ class Classifier:
         except KeyError:
             filters = repeat(Filter.Pass)
 
-        for sample_idx, gt in enumerate(starmap(Genotype.from_arr, variant.genotypes)):
+        for sample_idx, gt in enumerate(map(Genotype.from_arr, variant.genotypes)):
             failed_filter = next(filters) is Filter.Fail
             if failed_filter:
                 continue
