@@ -350,7 +350,7 @@ rule pileup:
     resources:
         mem_mb=lambda wildcards, attempt: int(32 * GB) * attempt,
     params:
-        options="--ignore-overlaps -O b",
+        options="--ignore-overlaps -O b -Q 7",
     log:
         rule_log_dir / "pileup.log",
     container:
