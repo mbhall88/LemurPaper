@@ -168,7 +168,7 @@ rule add_lemur_to_decontam_db:
         """
         cat {params.db} {input.asm} > {output.db} 2> {log}
         (rg {params.rg_opts} -r {params.replace_with} {params.seqid_pattern} {input.asm} | \
-          awk '{{ print "{params.name}\t{params.contamination_code}\t"$1 }}' \
+          awk '{{ print "{params.name}\t{params.contamination_code}\t"$1 }}' | \
           cat {params.metadata} -) > {output.metadata} 2>> {log}
         """
 
