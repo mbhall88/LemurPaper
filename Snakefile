@@ -48,6 +48,7 @@ output_files.add(lineage_dir / "lemur.lineage.csv")
 output_files.add(qc_dir / "qc.html")
 output_files.add(qc_dir / "lemur.krona.html")
 output_files.add(mykrobe_dir / "lemur.dst.json")
+output_files.add(distance_dir / "heatmap.html")
 
 
 # ======================================================
@@ -554,3 +555,48 @@ rule aggregate_consensus:
         rule_log_dir / "aggregate_consensus.log",
     shell:
         "awk 1 {input.lemur} {input.others} > {output.fasta} 2> {log}"
+
+
+rule snp_distance:
+    input:
+        fasta=rules.aggregate_consensus.output.fasta,
+    output:
+        matrix=distance_dir / "matrix.csv",
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: int(GB) * attempt,
+    container:
+        containers["snp-dists"]
+    log:
+        rule_log_dir / "snp_distance.log",
+    params:
+        options="-c",
+    shell:
+        """
+        snp-dists {params.options} {input.fasta} 2> {log} > {output.matrix}
+        """
+
+
+rule plot_distance_matrix:
+    input:
+        matrix=rules.snp_distance.output.matrix,
+    output:
+        plot=report(
+            distance_dir / "heatmap.html",
+            category="Distance",
+            caption=captions["distance_matrix"],
+        ),
+    params:
+        script=scripts["plot_distance_matrix"],
+        options=" ".join(["--delim ,", "--title 'Pairwise distance'",]),
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    container:
+        containers["conda"]
+    conda:
+        envs["plot_distance_matrix"]
+    shell:
+        """
+        python {params.script} {params.options} -i {input.matrix} -o {output.plot}
+        """

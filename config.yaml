@@ -2,11 +2,12 @@ fast5_dir:            "fast5/"
 model_config:         "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
 decontam_db:          "/hps/nobackup/research/zi/projects/tech_wars/data/QC/decontam_db/"
 containers:
-  guppy:   "library://mbhall88/default/guppy-gpu:3.4.5"
-  conda:   "docker://continuumio/miniconda3:4.7.12"
-  pycoqc:  "docker://quay.io/biocontainers/pycoqc:2.5.0.23--py_0"
-  krona:   "docker://quay.io/biocontainers/krona:2.7--pl526_2"
-  mykrobe: "docker://quay.io/biocontainers/mykrobe:0.8.2--py36h1c69254_1"
+  guppy:     "library://mbhall88/default/guppy-gpu:3.4.5"
+  conda:     "docker://continuumio/miniconda3:4.7.12"
+  pycoqc:    "docker://quay.io/biocontainers/pycoqc:2.5.0.23--py_0"
+  krona:     "docker://quay.io/biocontainers/krona:2.7--pl526_2"
+  mykrobe:   "docker://quay.io/biocontainers/mykrobe:0.8.2--py36h1c69254_1"
+  snp-dists: "docker://quay.io/biocontainers/snp-dists:0.7.0--hed695b0_0"
 envs:
   aln_tools:            "envs/aln_tools.yaml"
   filter_reads:         "envs/filter_reads.yaml"
@@ -15,17 +16,20 @@ envs:
   filter_snps:          "envs/filter_snps.yaml"
   assign_lineages:      "envs/assign_lineages.yaml"
   consensus:            "envs/consensus.yaml"
+  plot_distance_matrix: "envs/plot_distance_matrix.yaml"
 scripts:
   filter_reads:         "scripts/filter_reads.py"
   generate_krona_input: "scripts/generate_krona_input.py"
   filter_snps:          "scripts/apply_filters.py"
   assign_lineages:      "scripts/assign_lineages.py"
   consensus:            "scripts/consensus.py"
+  plot_distance_matrix: "scripts/plot_distance_matrix.py"
 captions:
-  pycoqc:  "report/pycoqc.rst"
-  krona:   "report/krona.rst"
-  mykrobe: "report/mykrobe.rst"
-  lineage: "report/lineage.rst"
+  pycoqc:          "report/pycoqc.rst"
+  krona:           "report/krona.rst"
+  mykrobe:         "report/mykrobe.rst"
+  lineage:         "report/lineage.rst"
+  distance_matrix: "report/distance_matrix.rst"
 genome_size:          4411532
 lineage_panel:        "resources/snps_for_typing.csv"
 default_lineage:      "unknown"  # the name given to samples with no variants in the panel of lineage-defining variants
@@ -46,7 +50,7 @@ filters:
   min_rpb:         0.05
   max_sgb:         -0.5
   min_vdb:         0.002
-other_consensus_dir: "/hps/nobackup/research/zi/projects/tech_wars/analysis/baseline_variants/consensus/bcftools/madagascar"
+other_consensus_dir:  "/hps/nobackup/research/zi/projects/tech_wars/analysis/baseline_variants/consensus/bcftools/madagascar"
 other_consensuses:
   - "mada_116"
   - "mada_134"
