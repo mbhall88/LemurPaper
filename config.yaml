@@ -1,6 +1,6 @@
-fast5_dir:     "fast5/"
-model_config:  "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
-decontam_db:   "/hps/nobackup/research/zi/projects/tech_wars/data/QC/decontam_db/"
+fast5_dir:            "fast5/"
+model_config:         "dna_r9.4.1_450bps_hac_prom.cfg"  # the basecalling model config
+decontam_db:          "/hps/nobackup/research/zi/projects/tech_wars/data/QC/decontam_db/"
 containers:
   guppy:   "library://mbhall88/default/guppy-gpu:3.4.5"
   conda:   "docker://continuumio/miniconda3:4.7.12"
@@ -24,10 +24,12 @@ captions:
   krona:   "report/krona.rst"
   mykrobe: "report/mykrobe.rst"
   lineage: "report/lineage.rst"
-genome_size:   4411532
-lineage_panel: "resources/snps_for_typing.csv"
+genome_size:          4411532
+lineage_panel:        "resources/snps_for_typing.csv"
 default_lineage:      "unknown"  # the name given to samples with no variants in the panel of lineage-defining variants
 ref_lineage_position: 1692141  # the position in the lineage panel that defines the lineage of H37Rv
+# taken from https://www.ncbi.nlm.nih.gov/assembly/GCA_004024665.1/
+lemur_assembly_url:   "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/024/665/GCA_004024665.1_LemCat_v1_BIUU/GCA_004024665.1_LemCat_v1_BIUU_genomic.fna.gz"
 h37rv:
   genome: "resources/h37rv.fa"
   mask:   "resources/compass-mask.bed"

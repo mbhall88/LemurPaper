@@ -31,6 +31,7 @@ pileup_dir = Path("pileup").resolve()
 calls_dir = Path("calls").resolve()
 filters = config["filters"]
 lineage_dir = Path("lineage").resolve()
+resource_dir = Path("resources").resolve()
 
 # ======================================================
 # Global functions and variables
@@ -127,15 +128,53 @@ rule qc_plots:
         """
 
 
+rule download_lemur_assembly:
+    output:
+        asm=resource_dir / "GCA_004024665.1.fa.gz",
+    resources:
+        mem_mb=int(0.3 * GB),
+    params:
+        url=config["lemur_assembly_url"],
+    log:
+        rule_log_dir / "download_lemur_assembly.log",
+    shell:
+        "wget {params.url} -O {output.asm} 2> {log}"
+
+
+rule add_lemur_to_decontam_db:
+    input:
+        asm=rules.download_lemur_assembly.output.asm,
+    output:
+        db=resource_dir / "remove_contam_with_lemur.fa.gz",
+        metadata=resource_dir / "remove_contam_with_lemur.tsv",
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    log:
+        rule_log_dir / "add_lemur_to_decontam_db.log",
+    params:
+        metadata=decontam_dir / "remove_contam.tsv",
+        db=decontam_dir / "remove_contam.fa.gz",
+        name="Lemur",
+        contamination_code="1",
+        accession="PVHV01000001.1",
+    shell:
+        """
+        cat {params.db} {input.asm} > {output.db} 2> {log}
+        printf "{params.name}\t{params.contamination_code}\t{params.accession}\n" | \
+          cat {params.metadata} - > {output.metadata} 2>> {log}
+        """
+
+
 rule map_reads_to_decontam_db:
     input:
-        index=decontam_dir / "remove_contam.fa.gz.map-ont.mmi",
+        target=rules.add_lemur_to_decontam_db.output.db,
         query=rules.combine_basecall_fastq.output.reads,
     output:
         bam=mapped_dir / "lemur.all.sorted.bam",
     threads: 8
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * int(16 * GB),
+        mem_mb=lambda wildcards, attempt: attempt * int(20 * GB),
     params:
         map_options="-aL2 -x map-ont",
         sort_options="-O bam",
@@ -147,7 +186,7 @@ rule map_reads_to_decontam_db:
         rule_log_dir / "map_reads_to_decontam_db.log",
     shell:
         """
-        (minimap2 {params.map_options} -t {threads} {input.index} {input.query} | \
+        (minimap2 {params.map_options} -t {threads} {input.target} {input.query} | \
             samtools sort -@ {threads} -o {output.bam}) 2> {log}
         """
 
@@ -174,7 +213,7 @@ rule filter_contamination:
     input:
         bam=rules.map_reads_to_decontam_db.output.bam,
         index=rules.index_mapped_reads.output.index,
-        metadata=decontam_dir / "remove_contam.tsv",
+        metadata=rules.add_lemur_to_decontam_db.output.metadata,
     output:
         keep_ids=filtered_dir / "keep.reads",
         contam_ids=filtered_dir / "contaminant.reads",
