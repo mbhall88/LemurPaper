@@ -157,12 +157,19 @@ rule add_lemur_to_decontam_db:
         db=decontam_dir / "remove_contam.fa.gz",
         name="Lemur",
         contamination_code="1",
-        accession="PVHV01000001.1",
+        seqid_pattern=r"'^>(?P<id>[\w\.]+)\s.*$'",
+        replace_with="'$id'",
+        rg_opts="-uu -o -N -z",
+    container:
+        containers["conda"]
+    conda:
+        envs["rg"]
     shell:
         """
         cat {params.db} {input.asm} > {output.db} 2> {log}
-        printf "{params.name}\t{params.contamination_code}\t{params.accession}\n" | \
-          cat {params.metadata} - > {output.metadata} 2>> {log}
+        (rg {params.rg_opts} -r {params.replace_with} {params.seqid_pattern} {input.asm} | \
+          awk '{{ print "{params.name}\t{params.contamination_code}\t"$1 }}' \
+          cat {params.metadata} -) > {output.metadata} 2>> {log}
         """
 
 
@@ -174,7 +181,7 @@ rule map_reads_to_decontam_db:
         bam=mapped_dir / "lemur.all.sorted.bam",
     threads: 8
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * int(32 * GB),
+        mem_mb=lambda wildcards, attempt: attempt * int(40 * GB),
     params:
         map_options="-aL2 -x map-ont -I 8G",
         sort_options="-O bam",
