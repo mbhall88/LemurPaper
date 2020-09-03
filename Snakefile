@@ -32,6 +32,13 @@ calls_dir = Path("calls").resolve()
 filters = config["filters"]
 lineage_dir = Path("lineage").resolve()
 resource_dir = Path("resources").resolve()
+consensus_dir = Path("consensus").resolve()
+distance_dir = Path("distance").resolve()
+other_consensuses: List[PathLike] = []
+other_consensus_dir = Path(config["other_consensus_dir"]).resolve()
+for sample in config["other_consensuses"]:
+    other_consensuses.append(other_consensus_dir / f"{sample}.consensus.fa")
+other_consensuses.append(Path(reference["genome"]).resolve())
 
 # ======================================================
 # Global functions and variables
@@ -501,3 +508,49 @@ rule assign_lineage:
             --ref-lineage-position {params.ref_lineage_position} \
             --max-alt-lineages {params.max_alt_lineages} {params.extras} 2> {log}
         """
+
+
+rule generate_consensus:
+    input:
+        mask=reference["mask"],
+        ref_fasta=reference["genome"],
+        vcf=rules.filter_snps.output.vcf,
+    output:
+        fasta=consensus_dir / "lemur.consensus.fa",
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: int(GB) * attempt,
+    container:
+        containers["conda"]
+    conda:
+        envs["consensus"]
+    params:
+        options=" ".join(
+            ["--verbose", "--ignore all", "--sample-id lemur", "--het-default none"]
+        ),
+        script=scripts["consensus"],
+    log:
+        rule_log_dir / "generate_consensus.log",
+    shell:
+        """
+        python {params.script} {params.options} \
+            -i {input.vcf} \
+            -f {input.ref_fasta} \
+            -m {input.mask} \
+            -o {output.fasta} 2> {log}
+        """
+
+
+rule aggregate_consensus:
+    input:
+        lemur=rules.generate_consensus.output.fasta,
+        others=other_consensuses,
+    output:
+        fasta=consensus_dir / "all.consensus.fa",
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    log:
+        rule_log_dir / "aggregate_consensus.log",
+    shell:
+        "awk 1 {input.lemur} {input.others} > {output.fasta} 2> {log}"

@@ -14,11 +14,13 @@ envs:
   generate_krona_input: "envs/generate_krona_input.yaml"
   filter_snps:          "envs/filter_snps.yaml"
   assign_lineages:      "envs/assign_lineages.yaml"
+  consensus:            "envs/consensus.yaml"
 scripts:
   filter_reads:         "scripts/filter_reads.py"
   generate_krona_input: "scripts/generate_krona_input.py"
   filter_snps:          "scripts/apply_filters.py"
   assign_lineages:      "scripts/assign_lineages.py"
+  consensus:            "scripts/consensus.py"
 captions:
   pycoqc:  "report/pycoqc.rst"
   krona:   "report/krona.rst"
@@ -44,3 +46,15 @@ filters:
   min_rpb:         0.05
   max_sgb:         -0.5
   min_vdb:         0.002
+other_consensus_dir: "/hps/nobackup/research/zi/projects/tech_wars/analysis/baseline_variants/consensus/bcftools/madagascar"
+other_consensuses:
+  - "mada_116"
+  - "mada_134"
+  - "mada_135"
+  - "mada_1-30"
+  - "mada_1-17"
+  - "mada_141"
+  - "mada_121"
+  - "mada_147"
+  - "mada_114"
+  - "mada_111"
