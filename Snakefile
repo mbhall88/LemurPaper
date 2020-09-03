@@ -174,9 +174,9 @@ rule map_reads_to_decontam_db:
         bam=mapped_dir / "lemur.all.sorted.bam",
     threads: 8
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * int(20 * GB),
+        mem_mb=lambda wildcards, attempt: attempt * int(32 * GB),
     params:
-        map_options="-aL2 -x map-ont",
+        map_options="-aL2 -x map-ont -I 8G",
         sort_options="-O bam",
     container:
         containers["conda"]

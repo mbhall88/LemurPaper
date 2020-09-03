@@ -239,3 +239,16 @@ dmypy.json
 cython_debug/
 .idea
 .python-version
+.conda
+.nv
+.snakemake
+QC
+basecall
+calls
+fast5
+filtered
+logs
+mapped
+mykrobe
+pileup
+resources
