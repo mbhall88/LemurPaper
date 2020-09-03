@@ -34,6 +34,7 @@ lineage_dir = Path("lineage").resolve()
 resource_dir = Path("resources").resolve()
 consensus_dir = Path("consensus").resolve()
 distance_dir = Path("distance").resolve()
+phylo_dir = Path("phylo").resolve()
 other_consensuses: List[PathLike] = []
 other_consensus_dir = Path(config["other_consensus_dir"]).resolve()
 for sample in config["other_consensuses"]:
@@ -49,6 +50,7 @@ output_files.add(qc_dir / "qc.html")
 output_files.add(qc_dir / "lemur.krona.html")
 output_files.add(mykrobe_dir / "lemur.dst.json")
 output_files.add(distance_dir / "heatmap.html")
+output_files.add(phylo_dir / "lemur.tree")
 
 
 # ======================================================
@@ -600,3 +602,21 @@ rule plot_distance_matrix:
         """
         python {params.script} {params.options} -i {input.matrix} -o {output.plot}
         """
+
+
+rule phylogenetic_tree:
+    input:
+        alignment=rules.aggregate_consensus.output.fasta,
+    output:
+        tree=phylo_dir / "lemur.tree",
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: int(GB) * attempt,
+    container:
+        containers["fasttree"]
+    log:
+        rule_log_dir / "phylogenetic_tree.log",
+    params:
+        options="-gtr -nt",
+    shell:
+        "FastTree {params.options} {input.alignment} > {output.tree} 2> {log}"
