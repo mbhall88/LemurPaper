@@ -611,12 +611,12 @@ rule phylogenetic_tree:
         tree=phylo_dir / "lemur.tree",
     threads: 1
     resources:
-        mem_mb=lambda wildcards, attempt: int(GB) * attempt,
+        mem_mb=lambda wildcards, attempt: int(16 * GB) * attempt,
     container:
         containers["fasttree"]
     log:
         rule_log_dir / "phylogenetic_tree.log",
     params:
-        options="-gtr -nt",
+        options="-gtr -nt -fastest",
     shell:
         "FastTree {params.options} {input.alignment} > {output.tree} 2> {log}"
