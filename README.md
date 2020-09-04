@@ -93,7 +93,7 @@ the Nanopore preset parameter configuration.
 ## Results
 
 
-## Nanopore-based SNP distance is a valid method for ruling out cross-contamination
+### Nanopore-based SNP distance is a valid method for ruling out cross-contamination
 
 To disprove the hypothesis that this sample was the result of cross-contamination in the
 sequencing laboratory, we compared the isolate to other lineage 3 samples sequenced at
