@@ -9,6 +9,7 @@ containers:
   mykrobe:   "docker://quay.io/biocontainers/mykrobe:0.8.2--py36h1c69254_1"
   snp-dists: "docker://quay.io/biocontainers/snp-dists:0.7.0--hed695b0_0"
   fasttree:  "docker://quay.io/biocontainers/fasttree:2.1.10--h516909a_4"
+  bedtools:  "docker://quay.io/biocontainers/bedtools:2.29.2--hc088bd4_0"
 envs:
   aln_tools:            "envs/aln_tools.yaml"
   filter_reads:         "envs/filter_reads.yaml"

@@ -39,7 +39,6 @@ other_consensuses: List[PathLike] = []
 other_consensus_dir = Path(config["other_consensus_dir"]).resolve()
 for sample in config["other_consensuses"]:
     other_consensuses.append(other_consensus_dir / f"{sample}.consensus.fa")
-other_consensuses.append(Path(reference["genome"]).resolve())
 
 # ======================================================
 # Global functions and variables
@@ -513,9 +512,29 @@ rule assign_lineage:
         """
 
 
+rule mask_h37rv:
+    input:
+        genome=reference["genome"],
+        mask=reference["mask"],
+    output:
+        masked_genome=resource_dir / "h37rv.masked.fa",
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    container:
+        containers["bedtools"]
+    log:
+        rule_log_dir / "mask_h37rv.log",
+    shell:
+        """
+        bedtools maskfasta -fi {input.genome} -bed {input.mask} \
+            -fo {output.masked_genome} 2> {log}
+        """
+
+
 rule generate_consensus:
     input:
-        mask=reference["mask"],
+        mask=rules.mask_h37rv.input.mask,
         ref_fasta=reference["genome"],
         vcf=rules.filter_snps.output.vcf,
     output:
@@ -548,6 +567,7 @@ rule aggregate_consensus:
     input:
         lemur=rules.generate_consensus.output.fasta,
         others=other_consensuses,
+        masked_ref=rules.mask_h37rv.output.masked_genome,
     output:
         fasta=consensus_dir / "all.consensus.fa",
     threads: 1
@@ -556,7 +576,7 @@ rule aggregate_consensus:
     log:
         rule_log_dir / "aggregate_consensus.log",
     shell:
-        "awk 1 {input.lemur} {input.others} > {output.fasta} 2> {log}"
+        "awk 1 {input.lemur} {input.others} {input.masked_ref} > {output.fasta} 2> {log}"
 
 
 rule snp_distance:
