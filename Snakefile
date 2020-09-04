@@ -723,6 +723,7 @@ rule plot_lemur_distance_matrix:
         ),
     params:
         script=scripts["plot_distance_matrix"],
+        exclude="NC_000962.3",
         options=" ".join(["--delim ,", "--title 'Pairwise distance'",]),
     threads: 1
     resources:
@@ -731,9 +732,12 @@ rule plot_lemur_distance_matrix:
         containers["conda"]
     conda:
         envs["plot_distance_matrix"]
+    log:
+        rule_log_dir / "plot_lemur_distance_matrix.log"
     shell:
         """
-        python {params.script} {params.options} -i {input.matrix} -o {output.plot}
+        python {params.script} {params.options} -e {params.exclude} -i {input.matrix} \
+            -o {output.plot} 2> {log}
         """
 
 

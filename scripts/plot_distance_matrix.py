@@ -67,6 +67,11 @@ def load_matrix(fpath: PathLike, delim: str) -> pd.DataFrame:
 @click.option(
     "--height", help="Plot height in pixels", default=HEIGHT, show_default=True
 )
+@click.option(
+    "-e",
+    "--exclude",
+    help="Comma-separated list of sample(s) to exclude from the heatmap.",
+)
 def main(
     matrix: str,
     output: str,
@@ -75,9 +80,14 @@ def main(
     title: str,
     height: int,
     width: int,
+    exclude: str,
 ):
     """This script generates an interactive heatmap (HTML) for a distance matrix."""
     matrix_df = load_matrix(matrix, delim)
+    if exclude:
+        exclude_samples = exclude.split(",")
+        matrix_df.drop(inplace=True, index=exclude_samples, columns=exclude_samples)
+
     samples = list(matrix_df.index)
     df = (
         matrix_df.stack()
