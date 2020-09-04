@@ -9,7 +9,7 @@
   - [Sample Distances](#sample-distances)
   - [Drug resistance prediction](#drug-resistance-prediction)
 - [Results](#results)
-- [Nanopore-based SNP distance is a valid method for ruling out cross-contamination](#nanopore-based-snp-distance-is-a-valid-method-for-ruling-out-cross-contamination)
+  - [Nanopore-based SNP distance is a valid method for ruling out cross-contamination](#nanopore-based-snp-distance-is-a-valid-method-for-ruling-out-cross-contamination)
   - [Lineage 3, Streptomycin-resistance *M. tuberculosis* found in a lemur](#lineage-3-streptomycin-resistance-m-tuberculosis-found-in-a-lemur)
 - [References](#references)
 
