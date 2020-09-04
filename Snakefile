@@ -48,11 +48,11 @@ output_files.add(lineage_dir / "lemur.lineage.csv")
 output_files.add(qc_dir / "qc.html")
 output_files.add(qc_dir / "lemur.krona.html")
 output_files.add(mykrobe_dir / "lemur.dst.json")
-output_files.add(distance_dir / "heatmap.html")
 output_files.add(phylo_dir / "lemur.tree")
 output_files.add(distance_dir / "non_lemur.dotplot.html")
 output_files.add(distance_dir / "non_lemur.heatmap.nanopore.html")
 output_files.add(distance_dir / "non_lemur.heatmap.illumina.html")
+output_files.add(distance_dir / "heatmap.nanopore.html")
 
 
 # ======================================================
