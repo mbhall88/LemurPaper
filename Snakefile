@@ -728,7 +728,7 @@ rule plot_lemur_distance_matrix:
     container:
         containers["conda"]
     conda:
-        envs["plot_nanopore_distance_matrix"]
+        envs["plot_distance_matrix"]
     shell:
         """
         python {params.script} {params.options} -i {input.matrix} -o {output.plot}
