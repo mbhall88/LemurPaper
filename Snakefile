@@ -50,6 +50,9 @@ output_files.add(qc_dir / "lemur.krona.html")
 output_files.add(mykrobe_dir / "lemur.dst.json")
 output_files.add(distance_dir / "heatmap.html")
 output_files.add(phylo_dir / "lemur.tree")
+output_files.add(distance_dir / "non_lemur.dotplot.html")
+output_files.add(distance_dir / "non_lemur.heatmap.nanopore.html")
+output_files.add(distance_dir / "non_lemur.heatmap.illumina.html")
 
 
 # ======================================================
@@ -563,13 +566,121 @@ rule generate_consensus:
         """
 
 
+def infer_non_lemur_consensus_path(wildcards) -> List[str]:
+    paths = []
+    for sample in config["other_consensuses"]:
+        caller = "bcftools" if wildcards.tech == "nanopore" else "compass"
+        path = other_consensus_dir / f"{caller}/madagascar/{sample}.consensus.fa"
+        paths.append(str(path))
+    return paths
+
+
+rule aggregate_non_lemur_consensus:
+    input:
+        non_lemur_consensuses=infer_non_lemur_consensus_path,
+    output:
+        fasta=consensus_dir / "non_lemur.consensus.{tech}.fa",
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    log:
+        rule_log_dir / "aggregate_non_lemur_consensus/{tech}.log",
+    shell:
+        "awk 1 {input.non_lemur_consensuses} > {output.fasta} 2> {log}"
+
+
+rule non_lemur_snp_distance:
+    input:
+        fasta=rules.aggregate_non_lemur_consensus.output.fasta,
+    output:
+        matrix=distance_dir / "non_lemur.matrix.{tech}.csv",
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: int(GB) * attempt,
+    container:
+        containers["snp-dists"]
+    log:
+        rule_log_dir / "non_lemur_snp_distance/{tech}.log",
+    params:
+        options="-c",
+    shell:
+        """
+        snp-dists {params.options} {input.fasta} 2> {log} > {output.matrix}
+        """
+
+
+rule plot_non_lemur_distance_matrix:
+    input:
+        matrix=rules.non_lemur_snp_distance.output.matrix,
+    output:
+        plot=report(
+            distance_dir / "non_lemur.heatmap.{tech}.html",
+            category="Distance",
+            caption=captions["distance_matrix"],
+        ),
+    params:
+        script=scripts["plot_distance_matrix"],
+        options=" ".join(
+            ["--delim ,", "--title 'Non Lemur Samples {tech} Pairwise distance'",]
+        ),
+    threads: 1
+    resources:
+        mem_mb=int(GB),
+    container:
+        containers["conda"]
+    conda:
+        envs["plot_distance_matrix"]
+    shell:
+        """
+        python {params.script} {params.options} -i {input.matrix} -o {output.plot}
+        """
+
+
+rule dotplot_non_lemur_samples:
+    input:
+        x_matrix=distance_dir / "non_lemur.matrix.illumina.csv",
+        y_matrix=distance_dir / "non_lemur.matrix.nanopore.csv",
+    output:
+        plot=report(
+            distance_dir / "non_lemur.dotplot.html",
+            caption=report_dir / "dotplot.rst",
+            category="Distance",
+        ),
+    threads: 1
+    resources:
+        mem_mb=int(2 * GB),
+    container:
+        containers["conda"]
+    conda:
+        envs["dotplot"]
+    params:
+        script=scripts["dotplot"],
+        xname="illumina",
+        yname="nanopore",
+        options=" ".join(
+            [
+                "--title 'Pairwise SNP distances for illumina and nanopore calls'",
+                "--delim ,",
+            ]
+        ),
+    log:
+        rule_log_dir / "dotplot_non_lemur_samples.log",
+    shell:
+        """
+        python {params.script} {params.options} \
+            -X {params.xname} -Y {params.yname} \
+            -x {input.x_matrix} -y {input.y_matrix} \
+            -o {output.plot} 2> {log}
+        """
+
+
 rule aggregate_consensus:
     input:
         lemur=rules.generate_consensus.output.fasta,
-        others=other_consensuses,
+        others=consensus_dir / "non_lemur.consensus.nanopore.fa",
         masked_ref=rules.mask_h37rv.output.masked_genome,
     output:
-        fasta=consensus_dir / "all.consensus.fa",
+        fasta=consensus_dir / "consensus.nanopore.fa",
     threads: 1
     resources:
         mem_mb=int(GB),
@@ -579,18 +690,18 @@ rule aggregate_consensus:
         "awk 1 {input.lemur} {input.others} {input.masked_ref} > {output.fasta} 2> {log}"
 
 
-rule snp_distance:
+rule lemur_snp_distance:
     input:
         fasta=rules.aggregate_consensus.output.fasta,
     output:
-        matrix=distance_dir / "matrix.csv",
+        matrix=distance_dir / "matrix.nanopore.csv",
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: int(GB) * attempt,
     container:
         containers["snp-dists"]
     log:
-        rule_log_dir / "snp_distance.log",
+        rule_log_dir / "nanopore_snp_distance.log",
     params:
         options="-c",
     shell:
@@ -599,12 +710,12 @@ rule snp_distance:
         """
 
 
-rule plot_distance_matrix:
+rule plot_lemur_distance_matrix:
     input:
-        matrix=rules.snp_distance.output.matrix,
+        matrix=rules.lemur_snp_distance.output.matrix,
     output:
         plot=report(
-            distance_dir / "heatmap.html",
+            distance_dir / "heatmap.nanopore.html",
             category="Distance",
             caption=captions["distance_matrix"],
         ),
@@ -617,7 +728,7 @@ rule plot_distance_matrix:
     container:
         containers["conda"]
     conda:
-        envs["plot_distance_matrix"]
+        envs["plot_nanopore_distance_matrix"]
     shell:
         """
         python {params.script} {params.options} -i {input.matrix} -o {output.plot}
