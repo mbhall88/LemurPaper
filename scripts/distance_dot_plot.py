@@ -86,6 +86,20 @@ def load_matrix(fpath: str, delim: str) -> pd.DataFrame:
     help="Only plot pairs where SNP distance is no greater than this threshold.",
     type=int,
 )
+@click.option(
+    "-a",
+    "--alpha",
+    help="Transparency (alpha) of the points on the plot",
+    default=0.8,
+    show_default=True,
+)
+@click.option(
+    "-S",
+    "--point-size",
+    help="The size (diameter) for the points on the plot",
+    default=4,
+    show_default=True,
+)
 def main(
     x_matrix: str,
     y_matrix: str,
@@ -97,6 +111,8 @@ def main(
     width: int,
     height: int,
     threshold: int,
+    alpha: float,
+    point_size: int,
 ):
     if not xname:
         xname = Path(x_matrix).name.split(".")[0]
@@ -119,7 +135,7 @@ def main(
     if threshold:
         df = df.query(f"{xname} <= @threshold")
 
-    dot_alpha = 0.25
+    dot_alpha = alpha
     line_alpha = 0.75
     line_width = 2
     tooltips = [
@@ -139,7 +155,7 @@ def main(
         active_scroll="wheel_zoom",
         title=title,
     )
-    fig.circle(x=xname, y=yname, alpha=dot_alpha, source=df)
+    fig.circle(x=xname, y=yname, alpha=dot_alpha, source=df, size=point_size)
 
     # determine best fit line
     x = df[xname]

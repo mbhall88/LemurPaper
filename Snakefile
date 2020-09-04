@@ -661,6 +661,8 @@ rule dotplot_non_lemur_samples:
             [
                 "--title 'Pairwise SNP distances for illumina and nanopore calls'",
                 "--delim ,",
+                "--alpha 0.8",
+                "-S 8",
             ]
         ),
     log:
