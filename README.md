@@ -58,8 +58,8 @@ A consensus sequence was generated from the filtered VCF by replacing reference
 positions with the called alternate base were relevant. Any positions with a null
 genotype or that failed the filtering we masked in the output by replacing the reference
 positions with an N. Positions which do not appear in the VCF (i.e. no reads mapped to
-this region) were also masked, as were positions in the provided genome
-mask<sup>4</sup>.
+this region) were also masked, as were positions in a previously-defined genome mask of
+repetitve regions<sup>4</sup>.
 
 ### Lineage Calling
 
@@ -121,10 +121,9 @@ samples that is unlikely to be the result of laboratory cross-contamination. The
 lemur isolate's closest sample has a distance of 63 SNPs.
 
 ![lemur distance matrix heatmap](./imgs/lemur_heatmap.png)  
-*Figure 2: Heatmap showing
-the pairwise SNP distance between the lemur isolate and the validation samples based on
-Nanopore SNP calls made with `bcftools`. The colours indicate the distance with blue
-being closer and red being more distant.*
+*Figure 2: Heatmap showing the pairwise SNP distance between the lemur isolate and the
+validation samples based on Nanopore SNP calls made with `bcftools`. The colours
+indicate the distance with blue being closer and red being more distant.*
 
 As a final validation measure we built a phylogenetic tree of the lemur isolate, the
 validation samples, and the *Mtb* reference genome `NC_000962.3` (lineage 4). The tree
@@ -132,8 +131,8 @@ in Figure 3 confirm the other lineage calling method that the lemur isolate is f
 lineage 3.
 
 ![phylogenetic tree](./imgs/tree.png)  
-*Figure 3: Phylogenetic tree built with FastTree
-of the lemur isolate, validation samples, and *Mtb* reference `NC_000962.3`.*
+*Figure 3: Phylogenetic tree built with FastTree of the lemur isolate, validation
+samples, and *Mtb* reference `NC_000962.3`.*
 
 ### Lineage 3, Streptomycin-resistance *M. tuberculosis* found in a lemur
 
@@ -158,7 +157,9 @@ in the SNP calls and passed all filters.
    https://doi.org/10.2807/1560-7917.ES.2019.24.50.1900130
 3. Li, H. Improving SNP discovery by base alignment quality. Bioinformatics 27,
    1157–1158 (2011).
-4. **TODO** Need to add information about the mask - is there somewhere we can cite?
+4. Walker, T. M. et al. Assessment of Mycobacterium tuberculosis transmission in
+   Oxfordshire, UK, 2007–12, with whole pathogen genome sequences: an observational
+   study. Lancet Respir Medicine 2, 285–292 (2014).
 5. **TODO** need a citation for the lineage-defining SNP panel
 6. Seemann, Torsten. Source code for snp-dists software. (2018).
    doi:10.5281/zenodo.1411986
