@@ -74,7 +74,12 @@ lineage, then the most recent common ancestor sublineage is used. For example, i
 sample has SNPs for both lineage 3.1.1 and 3.1.2, then it is called lineage 3.1. If is
 more than one lineage-defining SNP from a different major lineage, then no lineage call
 is made for the sample.  
-The k-mer-based method ... (Zam to write)
+The k-mer-based method, implemented in the Mykrobe software [Bradley et al, 2015] uses the in 
+silico equivalent of PCR probes to detect the lineage informative SNPs from Stucki et 
+al (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041253).
+Using a k-mer size of 21, each SNP allele is defined by 20bp flanking regions on either side.
+ 
+
 
 ### Sample Distances
 
