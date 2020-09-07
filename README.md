@@ -66,27 +66,27 @@ repetitve regions<sup>4</sup>.
 We called the lineage of the sample with two separate methods: variant- and k-mer-based
 methods.  
 The variant-based method compares genomic positions that are known to be
-lineage-defining<sup>5</sup> to the variant calls for the sample. If the sample contains
-a lineage-defining SNP that passes all filters, is not in the genome mask, and has the
-relevant alternate allele genotype, then the full lineage for that SNP is added to a
-list. If a sample contains multiple lineage-defining SNPs from the same major lineage,
-then the most recent common ancestor sublineage is used. For example, if the sample has
-SNPs for both lineage 3.1.1 and 3.1.2, then it is called lineage 3.1. If is more than
-one lineage-defining SNP from a different major lineage, then no lineage call is made
-for the sample.  
+lineage-defining<sup>5,6,7</sup> to the variant calls for the sample. If the sample
+contains a lineage-defining SNP that passes all filters, is not in the genome mask, and
+has the relevant alternate allele genotype, then the full lineage for that SNP is added
+to a list. If a sample contains multiple lineage-defining SNPs from the same major
+lineage, then the most recent common ancestor sublineage is used. For example, if the
+sample has SNPs for both lineage 3.1.1 and 3.1.2, then it is called lineage 3.1. If is
+more than one lineage-defining SNP from a different major lineage, then no lineage call
+is made for the sample.  
 The k-mer-based method ... (Zam to write)
 
 ### Sample Distances
 
 All consensus sequences were combined into a single fasta file and
-`snp-dists`<sup>6</sup> (version 0.7.0) was used to calculate a SNP distance matrix.  
+`snp-dists`<sup>8</sup> (version 0.7.0) was used to calculate a SNP distance matrix.  
 A phylogenetic tree was constructed from the consensus sequences, with the addition of
-the *Mtb* reference genome `NC_000962.3` to act as an outgroup. FastTree<sup>7</sup> was
+the *Mtb* reference genome `NC_000962.3` to act as an outgroup. FastTree<sup>9</sup> was
 used to construct the tree with the generalised time-reversible model.
 
 ### Drug resistance prediction
 
-We ran `mykrobe predict`<sup>8</sup> (version 0.8.2) on the decontaminated data using
+We ran `mykrobe predict`<sup>10</sup> (version 0.8.2) on the decontaminated data using
 the Nanopore preset parameter configuration.
 
 
@@ -160,11 +160,17 @@ in the SNP calls and passed all filters.
 4. Walker, T. M. et al. Assessment of Mycobacterium tuberculosis transmission in
    Oxfordshire, UK, 2007–12, with whole pathogen genome sequences: an observational
    study. Lancet Respir Medicine 2, 285–292 (2014).
-5. **TODO** need a citation for the lineage-defining SNP panel
-6. Seemann, Torsten. Source code for snp-dists software. (2018).
+5. Shitikov, E., Kolchenko, S., Mokrousov, I. et al. Evolutionary pathway analysis and
+   unified classification of East Asian lineage of Mycobacterium tuberculosis . Sci Rep
+   7, 9227 (2017). https://doi.org/10.1038/s41598-017-10018-5
+6. Rutaihwa, L. K. et al. Multiple Introductions of Mycobacterium tuberculosis Lineage
+   2–Beijing Into Africa Over Centuries. Frontiers Ecol Evol 7, 112 (2019).
+7. Stucki, D. et al. Mycobacterium tuberculosis lineage 4 comprises globally distributed
+   and geographically restricted sublineages. Nat Genet 48, 1535–1543 (2016).
+8. Seemann, Torsten. Source code for snp-dists software. (2018).
    doi:10.5281/zenodo.1411986
-7. Price, M. N., Dehal, P. S. & Arkin, A. P. FastTree 2 – Approximately
+9. Price, M. N., Dehal, P. S. & Arkin, A. P. FastTree 2 – Approximately
    Maximum-Likelihood Trees for Large Alignments. Plos One 5, e9490 (2010).
-8. Hunt, M. et al. Antibiotic resistance prediction for Mycobacterium tuberculosis from
-   genome sequence data with Mykrobe. Wellcome Open Res 4, 191 (2019).
+10. Hunt, M. et al. Antibiotic resistance prediction for Mycobacterium tuberculosis from
+    genome sequence data with Mykrobe. Wellcome Open Res 4, 191 (2019).
 
