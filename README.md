@@ -74,24 +74,23 @@ lineage, then the most recent common ancestor sublineage is used. For example, i
 sample has SNPs for both lineage 3.1.1 and 3.1.2, then it is called lineage 3.1. If is
 more than one lineage-defining SNP from a different major lineage, then no lineage call
 is made for the sample.  
-The k-mer-based method, implemented in the Mykrobe software [Bradley et al, 2015] uses the in 
-silico equivalent of PCR probes to detect the lineage informative SNPs from Stucki et 
-al (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0041253).
-Using a k-mer size of 21, each SNP allele is defined by 20bp flanking regions on either side.
- 
+The k-mer-based method, implemented in the `mykrobe` software<sup>8</sup> uses the in
+silico equivalent of PCR probes to detect the lineage informative SNPs from Stucki *et
+al*<sup>9</sup>. Using a k-mer size of 21, each SNP allele is defined by 20bp flanking
+regions on either side.
 
 
 ### Sample Distances
 
 All consensus sequences were combined into a single fasta file and
-`snp-dists`<sup>8</sup> (version 0.7.0) was used to calculate a SNP distance matrix.  
+`snp-dists`<sup>10</sup> (version 0.7.0) was used to calculate a SNP distance matrix.  
 A phylogenetic tree was constructed from the consensus sequences, with the addition of
-the *Mtb* reference genome `NC_000962.3` to act as an outgroup. FastTree<sup>9</sup> was
-used to construct the tree with the generalised time-reversible model.
+the *Mtb* reference genome `NC_000962.3` to act as an outgroup. FastTree<sup>11</sup>
+was used to construct the tree with the generalised time-reversible model.
 
 ### Drug resistance prediction
 
-We ran `mykrobe predict`<sup>10</sup> (version 0.8.2) on the decontaminated data using
+We ran `mykrobe predict`<sup>12</sup> (version 0.8.2) on the decontaminated data using
 the Nanopore preset parameter configuration.
 
 
@@ -172,10 +171,14 @@ in the SNP calls and passed all filters.
    2–Beijing Into Africa Over Centuries. Frontiers Ecol Evol 7, 112 (2019).
 7. Stucki, D. et al. Mycobacterium tuberculosis lineage 4 comprises globally distributed
    and geographically restricted sublineages. Nat Genet 48, 1535–1543 (2016).
-8. Seemann, Torsten. Source code for snp-dists software. (2018).
-   doi:10.5281/zenodo.1411986
-9. Price, M. N., Dehal, P. S. & Arkin, A. P. FastTree 2 – Approximately
-   Maximum-Likelihood Trees for Large Alignments. Plos One 5, e9490 (2010).
-10. Hunt, M. et al. Antibiotic resistance prediction for Mycobacterium tuberculosis from
+8. Bradley, P. et al. Rapid antibiotic-resistance predictions from genome sequence data
+   for Staphylococcus aureus and Mycobacterium tuberculosis. Nat Commun 6, 10063 (2015).
+9. Stucki, D. et al. Two New Rapid SNP-Typing Methods for Classifying Mycobacterium
+   tuberculosis Complex into the Main Phylogenetic Lineages. Plos One 7, e41253 (2012).
+10. Seemann, Torsten. Source code for snp-dists software. (2018).
+    doi:10.5281/zenodo.1411986
+11. Price, M. N., Dehal, P. S. & Arkin, A. P. FastTree 2 – Approximately
+    Maximum-Likelihood Trees for Large Alignments. Plos One 5, e9490 (2010).
+12. Hunt, M. et al. Antibiotic resistance prediction for Mycobacterium tuberculosis from
     genome sequence data with Mykrobe. Wellcome Open Res 4, 191 (2019).
 
