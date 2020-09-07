@@ -121,7 +121,7 @@ def main(
     plot.grid.grid_line_color = None
     plot.axis.axis_line_color = None
     plot.axis.major_tick_line_color = None
-    plot.axis.major_label_text_font_size = "7px"
+    plot.axis.major_label_text_font_size = "12px"
     plot.axis.major_label_standoff = 0
     plot.xaxis.major_label_orientation = pi / 3
 
@@ -137,7 +137,7 @@ def main(
 
     color_bar = ColorBar(
         color_mapper=mapper,
-        major_label_text_font_size="7px",
+        major_label_text_font_size="12px",
         ticker=BasicTicker(desired_num_ticks=len(colors)),
         label_standoff=6,
         border_line_color=None,

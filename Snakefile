@@ -724,7 +724,7 @@ rule plot_lemur_distance_matrix:
     params:
         script=scripts["plot_distance_matrix"],
         exclude="NC_000962.3",
-        options=" ".join(["--delim ,", "--title 'Pairwise distance'",]),
+        options=" ".join(["--delim ,", "--title ' '",]),
     threads: 1
     resources:
         mem_mb=int(GB),
