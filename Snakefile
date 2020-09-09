@@ -775,10 +775,10 @@ rule phylogenetic_tree:
     params:
         options="-d nt",
         phyml_output=(
-            lambda wildcards, output: f"{Path(output.tree).name}_phyml_tree.txt"
+            lambda wildcards, input: Path(input.phylip).parent / f"{Path(input.phylip).name}_phyml_tree.txt"
         ),
     shell:
         """
-        phyml {params.options} -i {input.phylip} 2> {log}
+        phyml {params.options} -i {input.phylip} &> {log}
         mv {params.phyml_output} {output.tree} 2>> {log}
         """
