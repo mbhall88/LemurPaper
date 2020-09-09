@@ -10,6 +10,7 @@ containers:
   snp-dists: "docker://quay.io/biocontainers/snp-dists:0.7.0--hed695b0_0"
   fasttree:  "docker://quay.io/biocontainers/fasttree:2.1.10--h516909a_4"
   bedtools:  "docker://quay.io/biocontainers/bedtools:2.29.2--hc088bd4_0"
+  phyml:     "docker://quay.io/biocontainers/phyml:3.3.20200621--he7093c6_0"
 envs:
   aln_tools:            "envs/aln_tools.yaml"
   filter_reads:         "envs/filter_reads.yaml"
@@ -20,6 +21,7 @@ envs:
   consensus:            "envs/consensus.yaml"
   plot_distance_matrix: "envs/plot_distance_matrix.yaml"
   dotplot:              "envs/dotplot.yaml"
+  biopython:            "envs/biopython.yaml"
 scripts:
   filter_reads:         "scripts/filter_reads.py"
   generate_krona_input: "scripts/generate_krona_input.py"

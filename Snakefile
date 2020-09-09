@@ -733,7 +733,7 @@ rule plot_lemur_distance_matrix:
     conda:
         envs["plot_distance_matrix"]
     log:
-        rule_log_dir / "plot_lemur_distance_matrix.log"
+        rule_log_dir / "plot_lemur_distance_matrix.log",
     shell:
         """
         python {params.script} {params.options} -e {params.exclude} -i {input.matrix} \
@@ -741,19 +741,44 @@ rule plot_lemur_distance_matrix:
         """
 
 
+rule convert_fasta_to_phylip:
+    input:
+        fasta=rules.aggregate_consensus.output.fasta,
+    output:
+        phylip=phylo_dir / "lemur.phylip",
+    resources:
+        mem_mb=int(0.5 * GB),
+    log:
+        rule_log_dir / "convert_fasta_to_phylip.log",
+    container:
+        containers["conda"]
+    conda:
+        envs["biopython"]
+    shell:
+        """
+        python -c 'from Bio import SeqIO;SeqIO.write(SeqIO.parse("{input.fasta}", "fasta"), "{output.phylip}", "phylip");' 2> {log}
+        """
+
+
 rule phylogenetic_tree:
     input:
-        alignment=rules.aggregate_consensus.output.fasta,
+        phylip=rules.convert_fasta_to_phylip.output.phylip,
     output:
         tree=phylo_dir / "lemur.tree",
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: int(16 * GB) * attempt,
     container:
-        containers["fasttree"]
+        containers["phyml"]
     log:
         rule_log_dir / "phylogenetic_tree.log",
     params:
-        options="-gtr -nt -fastest",
+        options="-d nt",
+        phyml_output=(
+            lambda wildcards, output: f"{Path(output.tree).name}_phyml_tree.txt"
+        ),
     shell:
-        "FastTree {params.options} {input.alignment} > {output.tree} 2> {log}"
+        """
+        phyml {params.options} -i {input.phylip} 2> {log}
+        mv {params.phyml_output} {output.tree} 2>> {log}
+        """
