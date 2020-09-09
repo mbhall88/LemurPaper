@@ -85,8 +85,8 @@ regions on either side.
 All consensus sequences were combined into a single fasta file and
 `snp-dists`<sup>10</sup> (version 0.7.0) was used to calculate a SNP distance matrix.  
 A phylogenetic tree was constructed from the consensus sequences, with the addition of
-the *Mtb* reference genome `NC_000962.3` to act as an outgroup. FastTree<sup>11</sup>
-was used to construct the tree with the generalised time-reversible model.
+the *Mtb* reference genome `NC_000962.3` to act as an outgroup. PhyML<sup>11</sup> was
+used to construct the tree.
 
 ### Drug resistance prediction
 
@@ -135,8 +135,9 @@ in Figure 3 confirm the other lineage calling method that the lemur isolate is f
 lineage 3.
 
 ![phylogenetic tree](./imgs/tree.png)  
-*Figure 3: Phylogenetic tree built with FastTree of the lemur isolate, validation
-samples, and *Mtb* reference `NC_000962.3`.*
+*Figure 3: Phylogenetic tree, built with PhyML, of the lemur isolate, validation
+samples, and *Mtb* reference `NC_000962.3`. The numbers on the branches indicate the
+length of the branch, which is the average number of nucleotide substitutions per site.*
 
 ### Lineage 3, Streptomycin-resistance *M. tuberculosis* found in a lemur
 
@@ -177,8 +178,9 @@ in the SNP calls and passed all filters.
    tuberculosis Complex into the Main Phylogenetic Lineages. Plos One 7, e41253 (2012).
 10. Seemann, Torsten. Source code for snp-dists software. (2018).
     doi:10.5281/zenodo.1411986
-11. Price, M. N., Dehal, P. S. & Arkin, A. P. FastTree 2 – Approximately
-    Maximum-Likelihood Trees for Large Alignments. Plos One 5, e9490 (2010).
+11. Guindon, S. et al. New Algorithms and Methods to Estimate Maximum-Likelihood
+    Phylogenies: Assessing the Performance of PhyML 3.0. Systematic Biol 59, 307–321
+    (2010).
 12. Hunt, M. et al. Antibiotic resistance prediction for Mycobacterium tuberculosis from
     genome sequence data with Mykrobe. Wellcome Open Res 4, 191 (2019).
 
